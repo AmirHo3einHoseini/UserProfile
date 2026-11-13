@@ -5,7 +5,7 @@
         "commandName": "Project",
         "dotnetRunMessages": true,
         "launchBrowser": true,
-        "applicationUrl": "http://localhost:5126",
+        "applicationUrl": "http://0.0.0.0:5126",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }
@@ -14,9 +14,12 @@
         "commandName": "Project",
         "dotnetRunMessages": true,
         "launchBrowser": true,
-        "applicationUrl": "https://localhost:7254;http://localhost:5126",
+        "applicationUrl": "https://0.0.0.0:7254;http://0.0.0.0:5126",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "ASPNETCORE_Kestrel__Certificates__Default__Path": "Certificates/192.168.1.112+1.pem",
+          "ASPNETCORE_Kestrel__Certificates__Default__KeyPath": "Certificates/192.168.1.112+1-key.pem"
+
         }
       }
     }

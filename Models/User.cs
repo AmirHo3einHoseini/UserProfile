@@ -18,7 +18,7 @@
 
         public string Bio {  get; set; } = string.Empty;
 
-        public string ProfileImageUrl {  get; set; } = "https://via.placeholder.com/150";
+        public string ProfileImageUrl {  get; set; } = "/images/default-avatar.png";
 
 
     }
