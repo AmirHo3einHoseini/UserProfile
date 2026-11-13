@@ -1,54 +1,102 @@
-﻿using UserProfile.Models;
+﻿using System.Net.Mail;
+using System.Text;
+using System.Text.RegularExpressions;
+using UserProfile.Models;
 
 namespace UserProfile.Services
 {
     public class ProfileValidator
     {
-        public Dictionary<string,string> Validate(User profile)
+        public Dictionary<string, string> Validate(User profile, bool isPersian)
         {
             var errors = new Dictionary<string, string>();
 
             if (string.IsNullOrWhiteSpace(profile.FirstName))
             {
-                errors["FirstName"] = "نام نمی‌تواند خالی باشد.";
+                errors["FirstName"] = isPersian
+                     ? "نام نمی‌تواند خالی باشد."
+                     : "First name is required.";
             }
             if (string.IsNullOrWhiteSpace(profile.LastName))
             {
-                errors["LastName"] = "نام خانوادگی نمی‌تواند خالی باشد.";
+                errors["LastName"] = isPersian
+                     ? "نام خانوادگی نمی‌تواند خالی باشد."
+                     : "Last name is required.";
             }
             if (string.IsNullOrWhiteSpace(profile.Email))
-            
-                errors["Email"] = "ایمیل نمی‌تواند خالی باشد.";
-            else if (!isValidEmail(profile.Email))
-                    errors["Email"] = "فرمت ایمیل معتبر نیست.";
+
+                errors["Email"] = isPersian
+                     ? "ایمیل نمی‌تواند خالی باشد."
+                     : "Email is required.";
+            else if (!IsValidEmail(profile.Email))
+            {
+                errors["Email"] = isPersian
+                    ? "فرمت ایمیل معتبر نیست."
+                    : "Email format is invalid.";
+            }
 
 
             if (string.IsNullOrWhiteSpace(profile.Phone))
-                errors["Phone"] = "شماره تماس نمی‌تواند خالی باشد.";
-            else if (!isValidPhone(profile.Phone))
-                errors["Phone"] = "فرمت شماره تماس معتبر نیست.";
+            {
+                errors["Phone"] = isPersian
+                  ? "شماره تماس نمی‌تواند خالی باشد."
+                  : "Phone number is required.";
+            }
+
+            else if (!IsValidPhone(profile.Phone))
+            {
+                errors["Phone"] = isPersian
+                                   ? "شماره تماس معتبر نیست."
+                                   : "Phone number is invalid.";
+            }
+
 
             return errors;
         }
 
 
-        private bool isValidEmail(string email)
+        private bool IsValidEmail(string email)
         {
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
+                var normalizedEmail = email.Trim();
+                var address = new MailAddress(normalizedEmail);
+                return address.Address == normalizedEmail;
             }
-            catch
+            catch(FormatException)
             {
                 return false;
             }
         }
-        private bool isValidPhone(string phone)
+        private bool IsValidPhone(string phone)
         {
-            // فقط عدد، حداقل ۸ و حداکثر ۱۵ رقم (بعد از پیش‌شماره)
-            var cleaned = new string(phone.Where(char.IsDigit).ToArray());
-            return cleaned.Length >= 8 && cleaned.Length <= 15;
+            var normalizedPhone = NormalizeDigits(phone);
+            if (!Regex.IsMatch(normalizedPhone, @"^\+?[0-9\s().-]+$"))
+            {
+                return false;
+            }
+            var digitCount = normalizedPhone.Count(char.IsDigit);
+
+            return digitCount >= 8 && digitCount <= 15;
+        }
+
+        private static string NormalizeDigits(string value)
+        {
+            var result = new StringBuilder(value.Length);
+
+            foreach (var character in value)
+            {
+                if (char.IsDigit(character))
+                {
+                    result.Append((int)char.GetNumericValue(character));
+                }
+                else
+                {
+                    result.Append(character);
+                }
+            }
+
+            return result.ToString();
         }
     }
 }

@@ -62,19 +62,6 @@
                     }
                     else
                     {
-
-                        @if (validationErrors.Any())
-                        {
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach (var error in validationErrors)
-                                    {
-                                        <li>@error</li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-
                         <h4 class="mb-4 text-center">@(isPersian ? "ویرایش پروفایل" : "Edit Profile")</h4>
 
                         <div class="text-center mb-4">
@@ -91,7 +78,10 @@
                                 @(isPersian ? "نام" : "First Name")
                                 <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
                             </label>
-                            <input class="form-control @(validationErrors.ContainsKey("FirstName") ? "is-invalid" : "")" @bind="user.FirstName" />
+                            <input class="form-control @(validationErrors.ContainsKey("FirstName") ? "is-invalid" : "")"
+                                   @bind="user.FirstName"
+                                   @bind:event="oninput"
+                                   @bind:after="() => ValidateField(nameof(user.FirstName))" />
                             @if (validationErrors.ContainsKey("FirstName"))
                             {
                                 <div class="invalid-feedback d-block">
@@ -109,7 +99,9 @@
                                 <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
                             </label>
                             <input class="form-control @(validationErrors.ContainsKey("LastName") ? "is-invalid" : "")"
-                                   @bind="user.LastName" />
+                                   @bind="user.LastName"
+                                   @bind:event="oninput"
+                                   @bind:after="() => ValidateField(nameof(user.LastName))" />
                             @if (validationErrors.ContainsKey("LastName"))
                             {
                                 <div class="invalid-feedback d-block">
@@ -120,13 +112,43 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">@(isPersian ? "ایمیل" : "Email")</label>
-                            <input class="form-control" @bind="user.Email" />
+                            <label class="form-label">
+                                @(isPersian ? "ایمیل" : "Email")
+                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                            </label>
+                            <input class="form-control @(validationErrors.ContainsKey("Email") ? "is-invalid" : "")"
+                                   autocomplete="email"
+                                   type="email"
+                                   @bind="user.Email"
+                                   @bind:event="oninput"
+                                   @bind:after="() => ValidateField(nameof(user.Email))" />
+                                   
+                            @if (validationErrors.ContainsKey("Email"))
+                            {
+                                <dive class="invalid-feedback d-block">
+                                    @validationErrors["Email"]
+                                </dive>
+                            }
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">@(isPersian ? "تلفن" : "Phone")</label>
-                            <input class="form-control" @bind="user.Phone" />
+                            <label class="form-label">
+                                @(isPersian ? "تلفن" : "Phone")
+                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                            </label>
+                            <input class="form-control @(validationErrors.ContainsKey("Phone") ? "is-invalid" : "")"
+                                   type="tel"
+                                   autocomplete="tel"
+                                   inputmode="tel"
+                                   @bind="user.Phone"
+                                   @bind:event="oninput"
+                                   @bind:after="() => ValidateField(nameof(user.Phone))" />
+                            @if (validationErrors.ContainsKey("Phone"))
+                            {
+                                <div class="invalid-feedback d-block">
+                                    @validationErrors["Phone"]
+                                </div>
+                            }
                         </div>
 
                         <div class="mb-3">
@@ -214,7 +236,7 @@
 
     private void save()
     {
-        validationErrors = validator.Validate(user);
+        validationErrors = validator.Validate(user, isPersian);
 
         if (validationErrors.Any())
         {
@@ -236,6 +258,20 @@
         }
         isEditing = false;
         backupUser = null;
+    }
+
+    private void ValidateField(string propertyName)
+    {
+        var errors = validator.Validate(user, isPersian);
+
+        if (errors.TryGetValue(propertyName, out var errorMessage))
+        {
+            validationErrors[propertyName] = errorMessage;
+        }
+        else
+        {
+            validationErrors.Remove(propertyName);
+        }
     }
 
 
