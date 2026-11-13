@@ -1,10 +1,10 @@
-﻿@page "/profile"
+﻿@page "/"
 @rendermode InteractiveServer
 
 @using UserProfile.Models
 @using UserProfile.Services
 
-<PageTitle>پروفایل کاربر@(isPersian ? "پروفایل کاربر" : "User Profile")</PageTitle>
+<PageTitle>@(isPersian ? "پروفایل کاربر" : "User Profile")</PageTitle>
 
 <div class="container-fluid border-bottom py-2 mb-3">
     <div class="container d-flex justify-content-between align-baseline items-center">
@@ -91,7 +91,7 @@
                                 @(isPersian ? "نام" : "First Name")
                                 <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
                             </label>
-                            <input class="form-control @(validationErrors.ContainsKey("FirstName") ? "isinvalid" : "")" @bind="user.FirstName" />
+                            <input class="form-control @(validationErrors.ContainsKey("FirstName") ? "is-invalid" : "")" @bind="user.FirstName" />
                             @if (validationErrors.ContainsKey("FirstName"))
                             {
                                 <div class="invalid-feedback d-block">
@@ -106,10 +106,10 @@
                         <div class="mb-3">
                             <label class="form-label">
                                 @(isPersian ? "نام خانوادگی" : "Last Name")
-                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است":"This field is required")">*</span>
+                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
                             </label>
-                            <input class="form-control @(validationErrors.ContainsKey("FisrtName") ? "isinvalid":"")" 
-                            @bind="user.LastName" />
+                            <input class="form-control @(validationErrors.ContainsKey("LastName") ? "is-invalid" : "")"
+                                   @bind="user.LastName" />
                             @if (validationErrors.ContainsKey("LastName"))
                             {
                                 <div class="invalid-feedback d-block">
@@ -194,7 +194,6 @@
 
     private void enableEdit()
     {
-
         validationErrors.Clear();
 
         backupUser = new User
@@ -221,8 +220,8 @@
         {
             return;
         }
-       
-        
+
+
 
         isEditing = false;
         backupUser = null;
@@ -232,13 +231,7 @@
     {
         if (backupUser is not null)
         {
-            user.FirstName = backupUser.FirstName;
-            user.LastName = backupUser.LastName;
-            user.Email = backupUser.Email;
-            user.Phone = backupUser.Phone;
-            user.Address = backupUser.Address;
-            user.City = backupUser.City;
-            user.Bio = backupUser.Bio;
+            user = backupUser;
 
         }
         isEditing = false;
