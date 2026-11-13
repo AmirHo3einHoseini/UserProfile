@@ -1,0 +1,249 @@
+﻿@page "/profile"
+@rendermode InteractiveServer
+
+@using UserProfile.Models
+@using UserProfile.Services
+
+<PageTitle>پروفایل کاربر@(isPersian ? "پروفایل کاربر" : "User Profile")</PageTitle>
+
+<div class="container-fluid border-bottom py-2 mb-3">
+    <div class="container d-flex justify-content-between align-baseline items-center">
+        <div>
+            <!-- -->
+            <strong>@(isPersian ? "پروفایل کاربر" : "User Profile")</strong>
+        </div>
+
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                @onclick="toggleLanguage"
+                title="@(isPersian ? "Change language" : "تغییر زبان")">
+            <span style="font-size : 1.1rem;">🌐</span>
+            <span>@(isPersian ? "EN" : "FA")</span>
+        </button>
+    </div>
+</div>
+
+<div class="container mt-4" dir="@(isPersian ? "rtl" : "ltr")">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    @if (!isEditing)
+                    {
+                        <div class="text-center">
+                            <img src="@user.ProfileImageUrl"
+                                 class="rounded-circle mb-3"
+                                 width="120" height="120"
+                                 alt="Profile Image" />
+
+                            <h3>@user.FirstName @user.LastName</h3>
+                            <p class="text-muted">@user.Bio</p>
+                        </div>
+
+                        <hr />
+
+                        <div class="mt-3">
+                            <p><strong>@(isPersian ? "ایمیل" : "Email"):</strong>@user.Email</p>
+                            
+                            <p><strong>@(isPersian ? "تلفن" : "Phone"):</strong>@user.Phone</p>
+ 
+                            <p><strong>@(isPersian ? "آدرس" : "Address"):</strong>@user.Address</p>
+
+                            <p><strong>@(isPersian ? "شهر " : "City"):</strong>@user.City</p>
+                        </div>
+
+
+                        <div class="text-center mt-4">
+
+                            <button class="btn btn-primary" @onclick="enableEdit">
+                                @(isPersian ? "ویرایش پروفایل" : "Edit Profile")
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+
+                        @if (validationErrors.Any())
+                        {
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach (var error in validationErrors)
+                                    {
+                                        <li>@error</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <h4 class="mb-4 text-center">@(isPersian ? "ویرایش پروفایل" : "Edit Profile")</h4>
+
+                        <div class="text-center mb-4">
+                            <img src="@user.ProfileImageUrl"
+                                 class="rounded-circle"
+                                 width="100" height="100"
+                                 alt="Profile Image" />
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                @(isPersian ? "نام" : "First Name")
+                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                            </label>
+                            <input class="form-control @(validationErrors.ContainsKey("FirstName") ? "isinvalid" : "")" @bind="user.FirstName" />
+                            @if (validationErrors.ContainsKey("FirstName"))
+                            {
+                                <div class="invalid-feedback d-block">
+                                    @validationErrors["FirstName"]
+                                </div>
+                            }
+                        </div>
+
+
+
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                @(isPersian ? "نام خانوادگی" : "Last Name")
+                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است":"This field is required")">*</span>
+                            </label>
+                            <input class="form-control @(validationErrors.ContainsKey("FisrtName") ? "isinvalid":"")" 
+                            @bind="user.LastName" />
+                            @if (validationErrors.ContainsKey("LastName"))
+                            {
+                                <div class="invalid-feedback d-block">
+                                    @validationErrors["LastName"]
+                                </div>
+                            }
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@(isPersian ? "ایمیل" : "Email")</label>
+                            <input class="form-control" @bind="user.Email" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@(isPersian ? "تلفن" : "Phone")</label>
+                            <input class="form-control" @bind="user.Phone" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@(isPersian ? "آدرس" : "Address")</label>
+                            <input class="form-control" @bind="user.Address" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@(isPersian ? "شهر" : "City")</label>
+                            <input class="form-control" @bind="user.City" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@(isPersian ? "درباره من" : "Bio")</label>
+                            <textarea class="form-control" rows="3" @bind="user.Bio"></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-center mt-4">
+                            <button class=" btn btn-success" @onclick="save">
+                                @(isPersian ? "ذخیره" : "Save")
+                            </button>
+                            <button class="btn btn-outline-secondary" @onclick="cancelEdit">
+                                @(isPersian ? "انصراف" : "Cancel")
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+    private ProfileValidator validator = new ProfileValidator();
+
+    private Dictionary<string, string> validationErrors = new();
+
+    private bool isPersian = true;
+
+    private User user = new User
+    {
+        FirstName = "AmirHosein",
+        LastName = "Hoseini",
+        Email = "ahoseini162@gmail.com",
+        Phone = "09377620642",
+        Address = "Iran,Tehran",
+        City = "Tehran",
+        Bio = "Android Developer",
+        ProfileImageUrl = "https://via.placeholder.com/150",
+        Latitude = 35.6892,
+        Longitude = 51.3890
+    };
+
+
+    private User? backupUser;
+
+    private bool isEditing = false;
+    private void toggleLanguage()
+    {
+        isPersian = !isPersian;
+    }
+
+    private void enableEdit()
+    {
+
+        validationErrors.Clear();
+
+        backupUser = new User
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            Phone = user.Phone,
+            Address = user.Address,
+            City = user.City,
+            Bio = user.Bio,
+            ProfileImageUrl = user.ProfileImageUrl,
+            Latitude = user.Latitude,
+            Longitude = user.Longitude
+        };
+        isEditing = true;
+    }
+
+    private void save()
+    {
+        validationErrors = validator.Validate(user);
+
+        if (validationErrors.Any())
+        {
+            return;
+        }
+       
+        
+
+        isEditing = false;
+        backupUser = null;
+    }
+
+    private void cancelEdit()
+    {
+        if (backupUser is not null)
+        {
+            user.FirstName = backupUser.FirstName;
+            user.LastName = backupUser.LastName;
+            user.Email = backupUser.Email;
+            user.Phone = backupUser.Phone;
+            user.Address = backupUser.Address;
+            user.City = backupUser.City;
+            user.Bio = backupUser.Bio;
+
+        }
+        isEditing = false;
+        backupUser = null;
+    }
+
+
+}
