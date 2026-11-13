@@ -7,7 +7,7 @@
 <PageTitle>@(isPersian ? "پروفایل کاربر" : "User Profile")</PageTitle>
 
 <div class="container-fluid border-bottom py-2 mb-3">
-    <div class="container d-flex justify-content-between align-baseline items-center">
+    <div class="container d-flex justify-content-between align-items-center">
         <div>
             <!-- -->
             <strong>@(isPersian ? "پروفایل کاربر" : "User Profile")</strong>
@@ -22,35 +22,66 @@
     </div>
 </div>
 
-<div class="container mt-4" dir="@(isPersian ? "rtl" : "ltr")">
+<div class="container mt-4 profile-page" dir="@(isPersian ? "rtl" : "ltr")">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm profile-card">
                 <div class="card-body">
 
                     @if (!isEditing)
                     {
-                        <div class="text-center">
+                        <div class="profile-header">
                             <img src="@user.ProfileImageUrl"
-                                 class="rounded-circle mb-3"
-                                 width="120" height="120"
+                                 class="profile-avatar"
                                  alt="Profile Image" />
 
-                            <h3>@user.FirstName @user.LastName</h3>
-                            <p class="text-muted">@user.Bio</p>
+                            <div class="profile-heading">
+                                <h3>@user.FirstName @user.LastName</h3>
+                            </div>
                         </div>
 
-                        <hr />
-
-                        <div class="mt-3">
-                            <p><strong>@(isPersian ? "ایمیل" : "Email"):</strong>@user.Email</p>
-                            
-                            <p><strong>@(isPersian ? "تلفن" : "Phone"):</strong>@user.Phone</p>
- 
-                            <p><strong>@(isPersian ? "آدرس" : "Address"):</strong>@user.Address</p>
-
-                            <p><strong>@(isPersian ? "شهر " : "City"):</strong>@user.City</p>
+                        <div class="profile-bio">
+                            @user.Bio
                         </div>
+
+                     
+
+
+
+
+                        <div class="profile-details mt-4">
+
+                            <div class="profile-detail-row">
+                                <span class="profile-detail-label">
+                                    @(isPersian ? "ایمیل :" : "Email :")
+                                </span>
+                                <span class="profile-detail-value">@user.Email</span>
+                            </div>
+
+                            <div class="profile-detail-row">
+                                <span class="profile-detail-label">
+                                    @(isPersian ? "تلفن :" : "Phone :")
+                                </span>
+                                <span class="profile-detail-value">@user.Phone</span>
+                            </div>
+
+                            <div class="profile-detail-row">
+                                <span class="profile-detail-label">
+                                    @(isPersian ? "آدرس :" : "Address :")
+                                </span>
+                                <span class="profile-detail-value">@user.Address</span>
+                            </div>
+
+                            <div class="profile-detail-row">
+                                <span class="profile-detail-label">
+                                    @(isPersian ? "شهر :" : "City :")
+                                </span>
+                                <span class="profile-detail-value">@user.City</span>
+                            </div>
+
+                        </div>
+
+                       
 
 
                         <div class="text-center mt-4">
@@ -64,115 +95,128 @@
                     {
                         <h4 class="mb-4 text-center">@(isPersian ? "ویرایش پروفایل" : "Edit Profile")</h4>
 
-                        <div class="text-center mb-4">
-                            <img src="@user.ProfileImageUrl"
-                                 class="rounded-circle"
-                                 width="100" height="100"
-                                 alt="Profile Image" />
-                        </div>
+                        <div class="profile-form">
 
 
+                            <div class="profile-image-editor">
+                                <img src="@user.ProfileImageUrl"
+                                     class="profile-avatar"
+                                     alt="Profile Image" />
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                @(isPersian ? "نام" : "First Name")
-                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
-                            </label>
-                            <input class="form-control @(validationErrors.ContainsKey("FirstName") ? "is-invalid" : "")"
-                                   @bind="user.FirstName"
-                                   @bind:event="oninput"
-                                   @bind:after="() => ValidateField(nameof(user.FirstName))" />
-                            @if (validationErrors.ContainsKey("FirstName"))
-                            {
-                                <div class="invalid-feedback d-block">
-                                    @validationErrors["FirstName"]
-                                </div>
-                            }
-                        </div>
+                                <label class="form-label">
+                                    @(isPersian ? "تغییر تصویر پروفایل" : "Change profile picture")
+                                </label>
 
+                                <InputFile OnChange="HandleImageSelected"
+                                           accept="image/png,image/jpeg,image/webp" />
+                                @if (!string.IsNullOrEmpty(imageError))
+                                {
+                                    <div class="text-danger small mt-2">
+                                        @imageError
+                                    </div>
+                                }
+                            </div>
 
+                            
 
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">
+                                    @(isPersian ? "نام" : "First Name")
+                                    <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                                </label>
+                                <input id="firstName" class="form-control @(validationErrors.ContainsKey("FirstName") ? "is-invalid" : "")"
+                                       @bind="user.FirstName"
+                                       @bind:event="oninput"
+                                       @bind:after="() => ValidateField(nameof(user.FirstName))" />
+                                @if (validationErrors.ContainsKey("FirstName"))
+                                {
+                                    <div class="invalid-feedback d-block">
+                                        @validationErrors["FirstName"]
+                                    </div>
+                                }
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                @(isPersian ? "نام خانوادگی" : "Last Name")
-                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
-                            </label>
-                            <input class="form-control @(validationErrors.ContainsKey("LastName") ? "is-invalid" : "")"
-                                   @bind="user.LastName"
-                                   @bind:event="oninput"
-                                   @bind:after="() => ValidateField(nameof(user.LastName))" />
-                            @if (validationErrors.ContainsKey("LastName"))
-                            {
-                                <div class="invalid-feedback d-block">
-                                    @validationErrors["LastName"]
-                                </div>
-                            }
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">
+                                    @(isPersian ? "نام خانوادگی" : "Last Name")
+                                    <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                                </label>
+                                <input id="lastName" class="form-control @(validationErrors.ContainsKey("LastName") ? "is-invalid" : "")"
+                                       @bind="user.LastName"
+                                       @bind:event="oninput"
+                                       @bind:after="() => ValidateField(nameof(user.LastName))" />
+                                @if (validationErrors.ContainsKey("LastName"))
+                                {
+                                    <div class="invalid-feedback d-block">
+                                        @validationErrors["LastName"]
+                                    </div>
+                                }
 
-                        </div>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                @(isPersian ? "ایمیل" : "Email")
-                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
-                            </label>
-                            <input class="form-control @(validationErrors.ContainsKey("Email") ? "is-invalid" : "")"
-                                   autocomplete="email"
-                                   type="email"
-                                   @bind="user.Email"
-                                   @bind:event="oninput"
-                                   @bind:after="() => ValidateField(nameof(user.Email))" />
+                            <div class="mb-3">
+                                <label for="email" class="form-label">
+                                    @(isPersian ? "ایمیل" : "Email")
+                                    <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                                </label>
+                                <input id="email" class="form-control @(validationErrors.ContainsKey("Email") ? "is-invalid" : "")"
+                                       autocomplete="email"
+                                       type="email"
+                                       @bind="user.Email"
+                                       @bind:event="oninput"
+                                       @bind:after="() => ValidateField(nameof(user.Email))" />
                                    
-                            @if (validationErrors.ContainsKey("Email"))
-                            {
-                                <dive class="invalid-feedback d-block">
-                                    @validationErrors["Email"]
-                                </dive>
-                            }
-                        </div>
+                                @if (validationErrors.ContainsKey("Email"))
+                                {
+                                    <div class="invalid-feedback d-block">
+                                        @validationErrors["Email"]
+                                    </div>
+                                }
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                @(isPersian ? "تلفن" : "Phone")
-                                <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
-                            </label>
-                            <input class="form-control @(validationErrors.ContainsKey("Phone") ? "is-invalid" : "")"
-                                   type="tel"
-                                   autocomplete="tel"
-                                   inputmode="tel"
-                                   @bind="user.Phone"
-                                   @bind:event="oninput"
-                                   @bind:after="() => ValidateField(nameof(user.Phone))" />
-                            @if (validationErrors.ContainsKey("Phone"))
-                            {
-                                <div class="invalid-feedback d-block">
-                                    @validationErrors["Phone"]
-                                </div>
-                            }
-                        </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">
+                                    @(isPersian ? "تلفن" : "Phone")
+                                    <span class="text-danger" title="@(isPersian ? "این فیلد اجباری است" : "This field is required")">*</span>
+                                </label>
+                                <input id="phone" class="form-control @(validationErrors.ContainsKey("Phone") ? "is-invalid" : "")"
+                                       type="tel"
+                                       autocomplete="tel"
+                                       inputmode="tel"
+                                       @bind="user.Phone"
+                                       @bind:event="oninput"
+                                       @bind:after="() => ValidateField(nameof(user.Phone))" />
+                                @if (validationErrors.ContainsKey("Phone"))
+                                {
+                                    <div class="invalid-feedback d-block">
+                                        @validationErrors["Phone"]
+                                    </div>
+                                }
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">@(isPersian ? "آدرس" : "Address")</label>
-                            <input class="form-control" @bind="user.Address" />
-                        </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">@(isPersian ? "آدرس" : "Address")</label>
+                                <input id="address" class="form-control" @bind="user.Address" />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">@(isPersian ? "شهر" : "City")</label>
-                            <input class="form-control" @bind="user.City" />
-                        </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">@(isPersian ? "شهر" : "City")</label>
+                                <input id="city" class="form-control" @bind="user.City" />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">@(isPersian ? "درباره من" : "Bio")</label>
-                            <textarea class="form-control" rows="3" @bind="user.Bio"></textarea>
-                        </div>
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">@(isPersian ? "درباره من" : "Bio")</label>
+                                <textarea id="bio" class="form-control" rows="3" @bind="user.Bio"></textarea>
+                            </div>
 
-                        <div class="d-flex gap-2 justify-content-center mt-4">
-                            <button class=" btn btn-success" @onclick="save">
-                                @(isPersian ? "ذخیره" : "Save")
-                            </button>
-                            <button class="btn btn-outline-secondary" @onclick="cancelEdit">
-                                @(isPersian ? "انصراف" : "Cancel")
-                            </button>
+                            <div class="profile-form-actions">
+                                <button class=" btn btn-success" @onclick="save">
+                                    @(isPersian ? "ذخیره" : "Save")
+                                </button>
+                                <button class="btn btn-outline-secondary" @onclick="cancelEdit">
+                                    @(isPersian ? "انصراف" : "Cancel")
+                                </button>
+                            </div>
                         </div>
                     }
                 </div>
@@ -189,7 +233,7 @@
 
     private Dictionary<string, string> validationErrors = new();
 
-    private bool isPersian = true;
+    private bool isPersian = false;
 
     private User user = new User
     {
@@ -200,7 +244,7 @@
         Address = "Iran,Tehran",
         City = "Tehran",
         Bio = "Android Developer",
-        ProfileImageUrl = "https://via.placeholder.com/150",
+        ProfileImageUrl = "/default-avatar.png",
         Latitude = 35.6892,
         Longitude = 51.3890
     };
@@ -274,5 +318,53 @@
         }
     }
 
+    private string imageError = string.Empty;
 
+    private async Task HandleImageSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        // فقط فرمت‌های تصویری مجاز
+        var allowedTypes = new[]
+        {
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    };
+
+        if (!allowedTypes.Contains(file.ContentType))
+        {
+            imageError = isPersian
+                ? "فرمت تصویر معتبر نیست."
+                : "Invalid image format.";
+
+            return;
+        }
+
+        // حداکثر حجم مجاز: 5 مگابایت
+        const long maxFileSize = 5 * 1024 * 1024;
+
+        if (file.Size > maxFileSize)
+        {
+            imageError = isPersian
+                ? "حجم تصویر نباید بیشتر از ۵ مگابایت باشد."
+                : "Image size must not exceed 5 MB.";
+
+            return;
+        }
+
+        using var memoryStream = new MemoryStream();
+
+        await file.OpenReadStream(maxFileSize)
+                  .CopyToAsync(memoryStream);
+
+        var imageBytes = memoryStream.ToArray();
+
+        var base64 = Convert.ToBase64String(imageBytes);
+
+        user.ProfileImageUrl =
+            $"data:{file.ContentType};base64,{base64}";
+
+        imageError = string.Empty;
+    }
 }
