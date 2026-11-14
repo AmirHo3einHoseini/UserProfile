@@ -93,9 +93,6 @@
 
 
                             </div>
-
-
-                        
                         </div>
 
                     }
@@ -103,11 +100,24 @@
                     {
                         <h4 class="mb-4 text-center">@(isPersian ? "ویرایش پروفایل" : "Edit Profile")</h4>
 
-                        <div class="text-center mb-4">
-                            <img src="@user.ProfileImageUrl"
-                                 class="rounded-circle"
-                                 width="100" height="100"
-                                 alt="Profile Image" />
+                        <div class="profile-image-editor">
+                            <div class="profile-image-wrapper">
+                                <img src="@user.ProfileImageUrl"
+                                     class="profile-avatar"
+                                     alt="Profile Image" />
+
+                                <label class="image-upload-button"
+                                       title="@(isPersian ? "افزودن عکس" : "Add photo")">
+                                    <span><i class="bi bi-camera"></i></span>
+                                    <InputFile OnChange="HandleImageSelected"
+                                               accept="image/jpeg,image/png,image/webp" />
+                                </label>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(imageError))
+                            {
+                                <div class="text-danger small">@imageError</div>
+                            }
                         </div>
 
 
