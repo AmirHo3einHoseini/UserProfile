@@ -7,4 +7,8 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="D:\Delta Force Xtreme\Profile.razor" Link="Profile.razor" />
+  </ItemGroup>
+
 </Project>
